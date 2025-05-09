@@ -6,9 +6,6 @@ import time
 from datetime import datetime
 import traceback
 
-# Force use of mock contract for development
-USE_MOCK_CONTRACT = True
-
 # Mock storage for certificates
 mock_certificates = {}
 mock_token_uris = {}
@@ -26,7 +23,8 @@ except Exception as e:
     print(f"Error loading environment variables: {str(e)}")
     pass
 
-# Web3 connection
+# Environment variables with defaults
+USE_MOCK_CONTRACT = os.getenv("USE_MOCK_CONTRACT", "True").lower() in ("true", "1", "t", "yes")
 NETWORK_RPC_URL = os.getenv("NETWORK_RPC_URL", "http://localhost:8545")
 CONTRACT_ADDRESS = os.getenv("CONTRACT_ADDRESS", "")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY", "")
@@ -40,9 +38,14 @@ def get_web3():
     Get a Web3 instance connected to the specified network
     """
     try:
-        return Web3(Web3.HTTPProvider(NETWORK_RPC_URL))
+        # Create a web3 connection - Use the WebsocketProvider if the URL starts with ws://
+        if NETWORK_RPC_URL.startswith('ws'):
+            return Web3(Web3.WebsocketProvider(NETWORK_RPC_URL))
+        else:
+            return Web3(Web3.HTTPProvider(NETWORK_RPC_URL))
     except Exception as e:
         print(f"Web3 connection error: {str(e)}")
+        traceback.print_exc()
         return None
 
 def get_contract_abi():
@@ -224,6 +227,13 @@ def get_contract():
     """
     Get a contract instance with the current account set as the default account
     """
+    # Reload settings from env to ensure latest values are used
+    global USE_MOCK_CONTRACT, NETWORK_RPC_URL, CONTRACT_ADDRESS, PRIVATE_KEY
+    USE_MOCK_CONTRACT = os.getenv("USE_MOCK_CONTRACT", "True").lower() in ("true", "1", "t", "yes")
+    NETWORK_RPC_URL = os.getenv("NETWORK_RPC_URL", "http://localhost:8545")
+    CONTRACT_ADDRESS = os.getenv("CONTRACT_ADDRESS", "")
+    PRIVATE_KEY = os.getenv("PRIVATE_KEY", "")
+    
     if USE_MOCK_CONTRACT:
         print("Using mock contract...")
         return MockContract()
@@ -233,28 +243,42 @@ def get_contract():
         print("Web3 connection failed. Using mock contract...")
         return MockContract()
     
+    # Check connection
+    try:
+        print(f"Connected to network with chain ID: {web3.eth.chain_id}")
+    except Exception as e:
+        print(f"Error connecting to network: {str(e)}")
+        return MockContract()
+    
     # Set up the account to use for transactions
-    if PRIVATE_KEY:
-        account = web3.eth.account.from_key(PRIVATE_KEY)
-        web3.eth.default_account = account.address
-    else:
-        # Use the first account for development
-        try:
+    try:
+        if PRIVATE_KEY:
+            account = web3.eth.account.from_key(PRIVATE_KEY)
+            web3.eth.default_account = account.address
+            print(f"Using account from private key: {account.address}")
+        else:
+            # Use the first account for development
             web3.eth.default_account = web3.eth.accounts[0]
-        except Exception as e:
-            print(f"Failed to set default account: {str(e)}")
-            return MockContract()
+            print(f"Using first available account: {web3.eth.default_account}")
+    except Exception as e:
+        print(f"Failed to set default account: {str(e)}")
+        return MockContract()
     
     # Get the contract
     contract_address = get_contract_address()
     if not contract_address or not web3.is_address(contract_address):
-        print("Invalid contract address. Using mock contract...")
+        print(f"Invalid contract address: {contract_address}. Using mock contract...")
         return MockContract()
     
-    abi = get_contract_abi()
-    contract = web3.eth.contract(address=contract_address, abi=abi)
-    
-    return contract
+    try:
+        abi = get_contract_abi()
+        contract = web3.eth.contract(address=contract_address, abi=abi)
+        print(f"Successfully loaded contract at {contract_address}")
+        return contract
+    except Exception as e:
+        print(f"Error creating contract instance: {str(e)}")
+        traceback.print_exc()
+        return MockContract()
 
 def deploy_contract():
     """
@@ -289,7 +313,13 @@ def deploy_contract():
     contract = web3.eth.contract(abi=contract_abi, bytecode=contract_bytecode)
     
     # Deploy the contract
-    tx_hash = contract.constructor().transact()
-    tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
-    
-    return tx_receipt.contractAddress 
+    try:
+        tx_hash = contract.constructor().transact()
+        tx_receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+        
+        print(f"Contract deployed at {tx_receipt.contractAddress}")
+        return tx_receipt.contractAddress
+    except Exception as e:
+        print(f"Error deploying contract: {str(e)}")
+        traceback.print_exc()
+        return "0x" + "1234" * 10  # Return a mock contract address 

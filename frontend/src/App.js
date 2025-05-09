@@ -2,18 +2,15 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-
-// Context
 import { Web3Provider } from './context/Web3Context';
-
-// Pages
+import { Toaster } from 'react-hot-toast';
+import Layout from './components/Layout';
 import Home from './pages/Home';
 import IssueCertificate from './pages/IssueCertificate';
 import ViewCertificates from './pages/ViewCertificates';
 import CertificateDetail from './pages/CertificateDetail';
-
-// Components
-import Layout from './components/Layout';
+import Settings from './pages/Settings';
+import './App.css';
 
 // Create a theme
 const theme = createTheme({
@@ -51,12 +48,14 @@ function App() {
       <CssBaseline />
       <Web3Provider>
         <Router>
+          <Toaster position="top-right" />
           <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/issue" element={<IssueCertificate />} />
               <Route path="/certificates" element={<ViewCertificates />} />
               <Route path="/certificate/:id" element={<CertificateDetail />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </Layout>
         </Router>

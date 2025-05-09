@@ -14,6 +14,8 @@ An open-source platform for issuing and managing NFT certificates on Ethereum-co
 - ✅ Verify certificate authenticity
 - ✅ User-friendly interface with animations
 - ✅ Development mode with mock blockchain & IPFS
+- ✅ Configurable settings for blockchain and IPFS
+- ✅ Cross-platform compatibility (Windows, Linux, macOS)
 
 ## Project Structure
 
@@ -117,6 +119,21 @@ cd frontend && npm start
 
 The platform operates in development mode by default with mock implementations of blockchain and IPFS services. This allows you to test the platform without connecting to actual networks.
 
+### Using the Settings Page
+
+The platform includes a dedicated Settings page where you can configure:
+
+1. **Blockchain Settings**:
+   - Toggle between mock and real blockchain
+   - Set the Network RPC URL (e.g., Infura endpoint)
+   - Configure the deployed contract address
+
+2. **IPFS Settings**:
+   - Toggle between mock and real IPFS
+   - Configure Pinata API and Secret keys for actual IPFS storage
+
+Changes to these settings are stored in the backend's `.env` file and take effect after restarting the servers.
+
 ## Smart Contract Deployment (Optional)
 
 For production use, you'll need to deploy the smart contract to an actual network:
@@ -128,17 +145,13 @@ npx hardhat compile
 npx hardhat run scripts/deploy.js --network <your-network>
 ```
 
-After deployment, update the contract address in the `.env` file:
-
-```
-CONTRACT_ADDRESS=<your-deployed-contract-address>
-```
+After deployment, update the contract address in the Settings page or directly in the backend's `.env` file.
 
 ## Configuration
 
 ### Backend Configuration
 
-Create a `.env` file in the `backend` directory:
+Create a `.env` file in the `backend` directory (or use the Settings page):
 
 ```
 # Network Configuration
@@ -163,6 +176,14 @@ Create a `.env` file in the `frontend` directory:
 REACT_APP_API_URL=http://localhost:8000
 ```
 
+## Application Workflow
+
+1. **Connect Wallet**: Use the Connect Wallet button to link your MetaMask wallet
+2. **Issue Certificate**: Fill in certificate details and upload an image
+3. **View Certificates**: Browse all issued certificates in a grid or list view
+4. **Certificate Details**: View detailed information about a specific certificate
+5. **Settings**: Configure blockchain and IPFS options for development or production use
+
 ## Troubleshooting
 
 ### Common Issues
@@ -183,6 +204,19 @@ REACT_APP_API_URL=http://localhost:8000
 4. **PowerShell command chaining**:
    - Use semicolons (`;`) instead of `&&` in PowerShell
    - Example: `cd backend; python -m uvicorn main:app --reload`
+
+5. **"The token '&&' is not a valid statement separator" in PowerShell**:
+   - Use `;` instead of `&&` for command chaining in PowerShell
+   - Alternatively, use Command Prompt (cmd) which supports `&&`
+
+## Security Considerations
+
+In production environments:
+
+1. **Use HTTPS**: Configure your deployment to use HTTPS for all communications
+2. **Secure Private Keys**: Never expose private keys in your code or public repositories
+3. **API Rate Limiting**: Implement rate limiting on backend APIs
+4. **Input Validation**: Ensure all user inputs are validated server-side
 
 ## Contributing
 

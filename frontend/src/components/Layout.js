@@ -1,19 +1,49 @@
-import React, { useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Button, 
-  Container, 
-  Box, 
+import React, { useState, useContext } from 'react';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import {
+  AppBar,
+  Box,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography,
+  Button,
+  Divider,
+  useMediaQuery,
+  useTheme,
+  Tooltip,
+  Avatar,
+  Container,
   Paper,
-  Chip,
-  Avatar
+  Chip
 } from '@mui/material';
+import {
+  Menu as MenuIcon,
+  Home as HomeIcon,
+  Add as AddIcon,
+  ViewList as ViewListIcon,
+  AccountBalanceWallet as WalletIcon,
+  Settings as SettingsIcon,
+  Close as CloseIcon
+} from '@mui/icons-material';
 import { Web3Context } from '../context/Web3Context';
 
+const drawerWidth = 240;
+
+// Helper function to truncate blockchain addresses
+const truncateAddress = (address) => {
+  if (!address) return '';
+  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+};
+
 const Layout = ({ children }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { 
     account, 
@@ -24,106 +54,174 @@ const Layout = ({ children }) => {
     contractAddress 
   } = useContext(Web3Context);
 
-  // Truncate address for display
-  const truncateAddress = (address) => {
-    if (!address) return '';
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
   };
 
+  const menuItems = [
+    { text: 'Home', icon: <HomeIcon />, path: '/' },
+    { text: 'Issue Certificate', icon: <AddIcon />, path: '/issue' },
+    { text: 'View Certificates', icon: <ViewListIcon />, path: '/certificates' },
+    { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+  ];
+
+  const drawer = (
+    <div>
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="h6" component="div">
+          NFT Certificates
+        </Typography>
+        {isMobile && (
+          <IconButton onClick={handleDrawerToggle}>
+            <CloseIcon />
+          </IconButton>
+        )}
+      </Toolbar>
+      <Divider />
+      <List>
+        {menuItems.map((item) => (
+          <ListItem
+            button
+            key={item.text}
+            component={RouterLink}
+            to={item.path}
+            selected={location.pathname === item.path}
+            onClick={isMobile ? handleDrawerToggle : undefined}
+            sx={{
+              '&.Mui-selected': {
+                bgcolor: 'rgba(0, 0, 0, 0.08)',
+                borderLeft: `4px solid ${theme.palette.primary.main}`,
+                '& .MuiListItemIcon-root': {
+                  color: theme.palette.primary.main,
+                },
+              },
+            }}
+          >
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+      <Box sx={{ p: 2 }}>
+        {account ? (
+          <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<WalletIcon />}
+            sx={{ textTransform: 'none', justifyContent: 'flex-start' }}
+          >
+            {`${account.substring(0, 6)}...${account.substring(account.length - 4)}`}
+          </Button>
+        ) : (
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={<WalletIcon />}
+            onClick={connectWallet}
+          >
+            Connect Wallet
+          </Button>
+        )}
+      </Box>
+    </div>
+  );
+
   return (
-    <>
-      <AppBar position="static">
+    <Box sx={{ display: 'flex' }}>
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          ml: { md: `${drawerWidth}px` },
+        }}
+      >
         <Toolbar>
-          <Typography variant="h6" component={Link} to="/" style={{ textDecoration: 'none', color: 'white', flexGrow: 1 }}>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { md: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             NFT Certificate Platform
           </Typography>
-          
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Button 
-              color="inherit" 
-              component={Link} 
-              to="/" 
-              variant={location.pathname === '/' ? 'outlined' : 'text'}
-            >
-              Home
-            </Button>
-            
-            <Button 
-              color="inherit" 
-              component={Link} 
-              to="/issue" 
-              variant={location.pathname === '/issue' ? 'outlined' : 'text'}
-              disabled={!isDeployed}
-            >
-              Issue Certificate
-            </Button>
-            
-            <Button 
-              color="inherit" 
-              component={Link} 
-              to="/certificates" 
-              variant={location.pathname === '/certificates' ? 'outlined' : 'text'}
-              disabled={!isDeployed}
-            >
-              View Certificates
-            </Button>
-            
+          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {account ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Chip 
-                  avatar={<Avatar>{network && network[0]}</Avatar>}
-                  label={network || 'Unknown Network'}
-                  size="small"
-                  color="secondary"
-                />
-                
-                <Chip 
-                  label={truncateAddress(account)}
-                  size="small"
-                  variant="outlined"
-                  onClick={disconnectWallet}
-                  color="default"
-                  sx={{ background: 'rgba(255,255,255,0.2)' }}
-                />
-              </Box>
+              <Tooltip title={account}>
+                <Button color="inherit" startIcon={<WalletIcon />}>
+                  {`${account.substring(0, 6)}...${account.substring(account.length - 4)}`}
+                </Button>
+              </Tooltip>
             ) : (
-              <Button 
-                color="inherit" 
-                variant="outlined" 
-                onClick={connectWallet}
-              >
+              <Button color="inherit" onClick={connectWallet} startIcon={<WalletIcon />}>
                 Connect Wallet
               </Button>
             )}
           </Box>
         </Toolbar>
       </AppBar>
-      
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        {/* Display contract info if deployed */}
-        {isDeployed && (
-          <Paper 
-            sx={{ 
-              p: 2, 
-              mb: 3, 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              background: '#e3f2fd'
-            }}
-          >
-            <Typography variant="body2">
-              Contract Address: <Chip size="small" label={truncateAddress(contractAddress)} />
-            </Typography>
-            <Typography variant="body2">
-              Network: <Chip size="small" color="primary" label={network || 'Unknown'} />
-            </Typography>
-          </Paper>
-        )}
-        
-        {children}
-      </Container>
-    </>
+      <Box
+        component="nav"
+        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
+      >
+        <Drawer
+          variant={isMobile ? 'temporary' : 'permanent'}
+          open={isMobile ? mobileOpen : true}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile
+          }}
+          sx={{
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          minHeight: '100vh',
+          bgcolor: 'background.default',
+        }}
+      >
+        <Toolbar />
+        <Container maxWidth="xl">
+          {/* Display contract info if deployed */}
+          {isDeployed && (
+            <Paper 
+              sx={{ 
+                p: 2, 
+                mb: 3, 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: '#e3f2fd'
+              }}
+            >
+              <Typography variant="body2">
+                Contract Address: <Chip size="small" label={truncateAddress(contractAddress)} />
+              </Typography>
+              <Typography variant="body2">
+                Network: <Chip size="small" color="primary" label={network || 'Unknown'} />
+              </Typography>
+            </Paper>
+          )}
+          
+          {children}
+        </Container>
+      </Box>
+    </Box>
   );
 };
 

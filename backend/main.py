@@ -12,6 +12,7 @@ import ipfshttpclient
 from web3 import Web3
 import uvicorn
 import sys
+from dotenv import load_dotenv, find_dotenv, set_key
 
 # Add the current directory to the path so Python can find our local modules
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -370,6 +371,78 @@ async def get_network_info():
             "contractAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
             "rpcUrl": "http://localhost:8545"
         }
+
+@app.get("/api/settings")
+async def get_settings():
+    """
+    Get current platform settings
+    """
+    try:
+        # Import these values from the modules to ensure we get current values
+        from utils.contract import USE_MOCK_CONTRACT, NETWORK_RPC_URL, CONTRACT_ADDRESS
+        from utils.ipfs import USE_MOCK_IPFS, PINATA_API_KEY, PINATA_SECRET_KEY
+        
+        return {
+            "useMockContract": USE_MOCK_CONTRACT,
+            "useMockIPFS": USE_MOCK_IPFS,
+            "networkRpcUrl": NETWORK_RPC_URL,
+            "contractAddress": CONTRACT_ADDRESS,
+            "pinataApiKey": PINATA_API_KEY,
+            "pinataSecretKey": "********" if PINATA_SECRET_KEY else ""
+        }
+    except Exception as e:
+        print(f"Error getting settings: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/settings")
+async def update_settings(settings: dict):
+    """
+    Update platform settings
+    """
+    try:
+        # Find the .env file path
+        env_file = find_dotenv()
+        if not env_file:
+            # If no .env file exists, create one
+            env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+            with open(env_file, "w") as f:
+                f.write("# NFT Certificate Platform Settings\n")
+        
+        # Update settings in .env file
+        set_key(env_file, "USE_MOCK_CONTRACT", str(settings["useMockContract"]))
+        set_key(env_file, "USE_MOCK_IPFS", str(settings["useMockIPFS"]))
+        set_key(env_file, "NETWORK_RPC_URL", settings["networkRpcUrl"])
+        set_key(env_file, "CONTRACT_ADDRESS", settings["contractAddress"])
+        set_key(env_file, "PINATA_API_KEY", settings["pinataApiKey"])
+        
+        # Only update secret key if it's not masked
+        if settings["pinataSecretKey"] and settings["pinataSecretKey"] != "********":
+            set_key(env_file, "PINATA_SECRET_KEY", settings["pinataSecretKey"])
+        
+        # Reload environment variables
+        load_dotenv(override=True)
+        
+        # Also update in-memory variables
+        import utils.contract
+        import utils.ipfs
+        
+        utils.contract.USE_MOCK_CONTRACT = settings["useMockContract"]
+        utils.contract.NETWORK_RPC_URL = settings["networkRpcUrl"]
+        utils.contract.CONTRACT_ADDRESS = settings["contractAddress"]
+        
+        utils.ipfs.USE_MOCK_IPFS = settings["useMockIPFS"]
+        utils.ipfs.PINATA_API_KEY = settings["pinataApiKey"]
+        if settings["pinataSecretKey"] and settings["pinataSecretKey"] != "********":
+            utils.ipfs.PINATA_SECRET_KEY = settings["pinataSecretKey"]
+        
+        return {"message": "Settings updated successfully"}
+    except Exception as e:
+        print(f"Error updating settings: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True) 
