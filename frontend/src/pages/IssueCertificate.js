@@ -28,7 +28,8 @@ import {
   EventNote as DateIcon,
   Check as CheckIcon,
   ArrowBack as BackIcon,
-  ArrowForward as NextIcon
+  ArrowForward as NextIcon,
+  AccountBalanceWallet as WalletIcon
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { Web3Context } from '../context/Web3Context';
