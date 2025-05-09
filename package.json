@@ -1,0 +1,25 @@
+{
+  "name": "nft-certificate-platform",
+  "version": "1.0.0",
+  "description": "Platform for issuing and managing NFT certificates",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "npm run install:frontend && npm run install:contract",
+    "install:frontend": "cd frontend && npm install",
+    "install:contract": "cd smart_contract && npm install",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && python -m uvicorn main:app --reload",
+    "build:frontend": "cd frontend && npm run build",
+    "build:contract": "cd smart_contract && npx hardhat compile",
+    "test:frontend": "cd frontend && npm test",
+    "test:contract": "cd smart_contract && npx hardhat test"
+  },
+  "keywords": [
+    "nft",
+    "blockchain",
+    "certificate",
+    "ethereum"
+  ],
+  "author": "",
+  "license": "MIT"
+} 
