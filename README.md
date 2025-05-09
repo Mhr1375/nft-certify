@@ -31,6 +31,10 @@ nft-certificate-platform/
 ├── backend/              # Python FastAPI backend server
 ├── smart_contract/       # Solidity smart contracts
 ├── scripts/              # Helper scripts for running the platform
+│   ├── start_all.bat     # Windows script to start all services
+│   ├── start-all.sh      # Linux/macOS script to start all services
+│   ├── capture_screenshot.bat  # Windows screenshot helper
+│   └── capture_screenshot.sh   # Linux/macOS screenshot helper
 ├── run.bat               # Windows launcher script
 ├── run.sh                # Linux/macOS launcher script
 ├── README.md             # This documentation
@@ -221,6 +225,20 @@ In production environments:
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Creating Screenshots
+
+To update the application screenshot in the README:
+
+1. Run the screenshot helper script:
+   - Windows: `scripts\capture_screenshot.bat`
+   - Linux/macOS: `./scripts/capture_screenshot.sh`
+   
+2. The script will launch the application and guide you through the process of capturing and saving a screenshot.
+
+3. Navigate to the most visually appealing screen (like the dashboard or certificate view) before capturing.
+
+4. Save the screenshot as `frontend/public/screenshot.png` to automatically update the image in the README.
 
 ## License
 
