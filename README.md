@@ -65,8 +65,15 @@ nft-certificate-platform/
    ```
 
 3. Launch the application with a single click:
+   
+   Using Command Prompt (cmd):
    ```
    .\run.bat
+   ```
+
+   Using PowerShell:
+   ```powershell
+   .\scripts\powershell_run.ps1
    ```
 
 4. Open your browser and navigate to: http://localhost:3000
@@ -208,10 +215,16 @@ REACT_APP_API_URL=http://localhost:8000
 4. **PowerShell command chaining**:
    - Use semicolons (`;`) instead of `&&` in PowerShell
    - Example: `cd backend; python -m uvicorn main:app --reload`
+   - Alternatively, use our provided PowerShell script: `.\scripts\powershell_run.ps1`
 
 5. **"The token '&&' is not a valid statement separator" in PowerShell**:
    - Use `;` instead of `&&` for command chaining in PowerShell
    - Alternatively, use Command Prompt (cmd) which supports `&&`
+   - Or use our dedicated PowerShell script: `.\scripts\powershell_run.ps1`
+
+6. **"run.bat is not recognized as an internal or external command"**:
+   - In PowerShell, use `.\run.bat` (with the leading `.\`)
+   - Alternatively, use our PowerShell script: `.\scripts\powershell_run.ps1`
 
 ## Security Considerations
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -39,7 +39,8 @@ import { getCertificates } from '../utils/api';
 import toast from 'react-hot-toast';
 
 const ViewCertificates = () => {
-  const { account, isDeployed, contract } = useContext(Web3Context);
+  const navigate = useNavigate();
+  const { isDeployed } = useContext(Web3Context);
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

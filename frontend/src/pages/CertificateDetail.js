@@ -7,7 +7,6 @@ import {
   Paper,
   Grid,
   Card,
-  CardContent,
   Button,
   CircularProgress,
   Alert,
@@ -22,7 +21,6 @@ import {
   IconButton,
   Tooltip,
   Breadcrumbs,
-  Avatar,
   Stack,
   useTheme,
   alpha
@@ -35,7 +33,6 @@ import {
   ArrowBack as BackIcon,
   Download as DownloadIcon,
   Delete as DeleteIcon,
-  Edit as EditIcon,
   VerifiedUser as VerifiedIcon,
   GppBad as RevokedIcon,
   WifiProtectedSetup as BlockchainIcon,
@@ -49,7 +46,8 @@ const CertificateDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const theme = useTheme();
-  const { account, isDeployed, contract } = useContext(Web3Context);
+  const { isDeployed } = useContext(Web3Context);
+  // NOTE: We might need account and contract for future functionality
   
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(true);

@@ -12,12 +12,9 @@ import {
   CircularProgress,
   FormControl,
   FormHelperText,
-  InputLabel,
   Stepper,
   Step,
   StepLabel,
-  IconButton,
-  Tooltip,
   Card,
   Divider,
   alpha
@@ -31,8 +28,7 @@ import {
   EventNote as DateIcon,
   Check as CheckIcon,
   ArrowBack as BackIcon,
-  ArrowForward as NextIcon,
-  AccountBalanceWallet as WalletIcon
+  ArrowForward as NextIcon
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { Web3Context } from '../context/Web3Context';
@@ -74,7 +70,7 @@ const steps = ['Recipient Information', 'Certificate Details', 'Preview & Submit
 
 const IssueCertificate = () => {
   const navigate = useNavigate();
-  const { account, isDeployed, contract, contractAddress } = useContext(Web3Context);
+  const { isDeployed } = useContext(Web3Context);
   
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
