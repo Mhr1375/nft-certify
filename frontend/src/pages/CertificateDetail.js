@@ -36,11 +36,13 @@ import {
   VerifiedUser as VerifiedIcon,
   GppBad as RevokedIcon,
   WifiProtectedSetup as BlockchainIcon,
-  Info as InfoIcon
+  Info as InfoIcon,
+  Visibility as ViewOnlyIcon
 } from '@mui/icons-material';
 import { Web3Context } from '../context/Web3Context';
 import { getCertificate, revokeCertificate } from '../utils/api';
 import toast from 'react-hot-toast';
+import ImagePlaceholder from '../components/ImagePlaceholder';
 
 const CertificateDetail = () => {
   const { id } = useParams();
@@ -330,81 +332,116 @@ const CertificateDetail = () => {
                     whileHover={{ scale: 1.02 }}
                     className="certificate-image-container"
                   >
-                    <Box sx={{ 
-                      position: 'relative',
-                      maxWidth: '100%',
-                      boxShadow: theme => theme.palette.mode === 'light' 
-                        ? '0 10px 30px rgba(0,0,0,0.15)' 
-                        : '0 10px 30px rgba(0,0,0,0.3)',
-                      borderRadius: 2,
-                      overflow: 'hidden',
-                      border: theme => `4px solid ${theme.palette.background.paper}`,
-                    }}>
-                      {metadata && metadata.image ? (
-                        <Box>
-                          <img 
-                            src={metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/')} 
+                    {metadata && metadata.image ? (
+                      <Box sx={{ 
+                        position: 'relative', 
+                        width: '100%',
+                        maxWidth: '450px',
+                        boxShadow: theme => theme.palette.mode === 'light' 
+                          ? '0 10px 30px rgba(0,0,0,0.15)' 
+                          : '0 10px 30px rgba(0,0,0,0.3)',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        border: theme => `4px solid ${theme.palette.background.paper}`,
+                      }}>
+                        <Box
+                          component="div"
+                          sx={{
+                            position: 'relative',
+                            minHeight: '300px',
+                            backgroundColor: '#fff',
+                            borderRadius: 1,
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <Box
+                            component="img"
+                            src={metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/')}
                             alt={`Certificate for ${certificate.recipient_name}`}
-                            style={{ 
-                              width: '100%', 
-                              maxWidth: '450px', 
+                            sx={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
                               display: 'block',
-                              backgroundColor: '#fff'
+                              minHeight: '300px'
                             }}
                             onError={(e) => {
-                              e.target.src = '/placeholder-certificate.png';
+                              e.target.style.display = 'none';
                             }}
                           />
                           
-                          {/* Certificate status overlay */}
-                          {certificate.revoked && (
-                            <Box sx={{ 
-                              position: 'absolute', 
-                              top: 0, 
-                              left: 0, 
-                              right: 0, 
-                              bottom: 0, 
+                          <Box 
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              backgroundColor: 'rgba(0,0,0,0.5)',
-                            }}>
-                              <Typography 
-                                variant="h4" 
-                                color="white" 
-                                sx={{ 
-                                  transform: 'rotate(-25deg)',
-                                  border: '5px solid white',
-                                  padding: '8px 16px',
-                                  fontWeight: 'bold',
-                                  textTransform: 'uppercase',
-                                  letterSpacing: 2
-                                }}
-                              >
-                                Revoked
-                              </Typography>
-                            </Box>
-                          )}
+                              zIndex: 1
+                            }}
+                          >
+                            <ImagePlaceholder 
+                              width="100%" 
+                              height="300px" 
+                              text="Certificate Image Not Available" 
+                            />
+                          </Box>
                         </Box>
-                      ) : (
-                        <Box 
-                          sx={{ 
-                            height: '300px', 
-                            width: '100%',
-                            maxWidth: '450px',
-                            display: 'flex', 
-                            alignItems: 'center', 
+                        
+                        {/* Certificate status overlay */}
+                        {certificate.revoked && (
+                          <Box sx={{ 
+                            position: 'absolute', 
+                            top: 0, 
+                            left: 0, 
+                            right: 0, 
+                            bottom: 0, 
+                            display: 'flex',
+                            alignItems: 'center',
                             justifyContent: 'center',
-                            background: theme => theme.palette.mode === 'light' ? '#f5f5f5' : '#333',
-                            borderRadius: 1
-                          }}
-                        >
-                          <Typography variant="body1" color="text.secondary">
-                            No image available
-                          </Typography>
-                        </Box>
-                      )}
-                    </Box>
+                            backgroundColor: 'rgba(0,0,0,0.5)',
+                            zIndex: 2
+                          }}>
+                            <Typography 
+                              variant="h4" 
+                              color="white" 
+                              sx={{ 
+                                transform: 'rotate(-25deg)',
+                                border: '5px solid white',
+                                padding: '8px 16px',
+                                fontWeight: 'bold',
+                                textTransform: 'uppercase',
+                                letterSpacing: 2
+                              }}
+                            >
+                              Revoked
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    ) : (
+                      <Box 
+                        sx={{ 
+                          width: '100%',
+                          maxWidth: '450px',
+                          height: '300px',
+                          boxShadow: theme => theme.palette.mode === 'light' 
+                            ? '0 10px 30px rgba(0,0,0,0.15)' 
+                            : '0 10px 30px rgba(0,0,0,0.3)',
+                          borderRadius: 2,
+                          overflow: 'hidden',
+                          border: theme => `4px solid ${theme.palette.background.paper}`,
+                        }}
+                      >
+                        <ImagePlaceholder 
+                          height="300px"
+                          text="Certificate Image Not Available"
+                        />
+                      </Box>
+                    )}
                   </motion.div>
                   
                   <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>

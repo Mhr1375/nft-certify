@@ -1,13 +1,78 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Reset some default behaviors */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Responsive typography */
+html {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+/* Better focus outlines for accessibility */
+:focus {
+  outline: 2px solid rgba(63, 81, 181, 0.5);
+  outline-offset: 2px;
+}
+
+/* Remove focus outline for mouse users, retain for keyboard */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(63, 81, 181, 0.5);
+  outline-offset: 2px;
+}
+
+/* Base link styles */
+a {
+  color: #3f51b5;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #303f9f;
+}
+
+/* Mobile tap highlight */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Image defaults */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Better text rendering */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

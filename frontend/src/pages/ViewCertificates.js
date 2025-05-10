@@ -24,7 +24,8 @@ import {
   alpha,
   Skeleton,
   IconButton,
-  Tooltip
+  Tooltip,
+  useTheme
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -37,6 +38,7 @@ import {
 import { Web3Context } from '../context/Web3Context';
 import { getCertificates } from '../utils/api';
 import toast from 'react-hot-toast';
+import ImagePlaceholder from '../components/ImagePlaceholder';
 
 const ViewCertificates = () => {
   const navigate = useNavigate();
@@ -352,13 +354,10 @@ const ViewCertificates = () => {
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', duration: 0.5 }}
                   >
-                    <img 
-                      src="/placeholder-certificate.png" 
-                      alt="No certificates" 
-                      style={{ width: 100, height: 100, opacity: 0.5, marginBottom: 16 }}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
+                    <ImagePlaceholder 
+                      height="100px" 
+                      text="No certificates" 
+                      iconSize="large" 
                     />
                   </motion.div>
                   <Typography variant="h6" gutterBottom>
@@ -434,22 +433,54 @@ const ViewCertificates = () => {
                               alignItems: 'stretch'
                             }}
                           >
-                            {certificate.token_uri && (
-                              <CardMedia
+                            <CardMedia
+                              component="div"
+                              sx={{ 
+                                height: 160, 
+                                objectFit: 'cover', 
+                                background: theme => theme.palette.mode === 'light' ? '#f5f5f5' : '#333',
+                                borderBottom: theme => `1px solid ${theme.palette.divider}`,
+                                minHeight: '160px',
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <Box 
                                 component="img"
-                                height="160"
-                                image={certificate.token_uri.replace('ipfs://', 'https://ipfs.io/ipfs/')}
-                                alt={`Certificate for ${certificate.recipient_name}`}
-                                sx={{ 
-                                  objectFit: 'cover', 
-                                  background: theme => theme.palette.mode === 'light' ? '#f5f5f5' : '#333',
-                                  borderBottom: theme => `1px solid ${theme.palette.divider}`
+                                sx={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                  opacity: 1,
+                                  transition: 'opacity 0.3s ease'
                                 }}
+                                src={certificate.token_uri.replace('ipfs://', 'https://ipfs.io/ipfs/')}
+                                alt={`Certificate for ${certificate.recipient_name}`}
                                 onError={(e) => {
-                                  e.target.src = '/placeholder-certificate.png';
+                                  e.target.style.display = 'none';
                                 }}
                               />
-                            )}
+                              <Box 
+                                sx={{ 
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <ImagePlaceholder 
+                                  height="160px" 
+                                  text="Certificate Image" 
+                                  iconSize="medium" 
+                                />
+                              </Box>
+                            </CardMedia>
                             <CardContent sx={{ flexGrow: 1, position: 'relative' }}>
                               {certificate.revoked && (
                                 <Chip 
